@@ -29,8 +29,17 @@ public class Manager {
     private static KieServicesClient kieServicesClient;
 
     private static RuntimeManager manager;
-    private static RuntimeEngine runtime = manager.getRuntimeEngine(null);
-    private static KieSession ksession = runtime.getKieSession();
+    private static RuntimeEngine runtime;
+    private static KieSession ksession;
+
+    static {
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            public synchronized void run() {
+                if (null != manager && null != runtime)
+                    manager.disposeRuntimeEngine(runtime);
+            }
+        }));
+    }
 
     public static final RuntimeManager getRuntimeManager() {
         if (null != manager)
